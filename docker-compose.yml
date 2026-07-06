@@ -3,8 +3,11 @@ services:
     image: postgres
     restart: always
     environment:
+      POSTGRES_USER: root
       POSTGRES_PASSWORD: root
-      
+      POSTGRES_DB: postgres
+    ports:
+      - "5432:5432"
   adminer:
     image: adminer
     restart: always
