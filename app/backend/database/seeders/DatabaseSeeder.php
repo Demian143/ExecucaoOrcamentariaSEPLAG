@@ -18,10 +18,14 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        User::factory()->create([
-            'name' => 'Analista Seplag',
-            'email' => 'analista@seplag.rj.gov.br',
-            'password' => Hash::make('orcamento@2026'),
-        ]);
+        $this->call(DadosReferenciaSeeder::class);
+
+        User::updateOrCreate(
+            ['email' => 'analista@seplag.rj.gov.br'],
+            [
+                'name' => 'Analista Seplag',
+                'password' => Hash::make('orcamento@2026'),
+            ],
+        );
     }
 }
