@@ -18,7 +18,7 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call(DadosReferenciaSeeder::class);
+        $this->call(OrcamentoSeeder::class);
 
         User::updateOrCreate(
             ['email' => 'analista@seplag.rj.gov.br'],

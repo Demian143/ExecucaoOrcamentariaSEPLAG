@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
 use RuntimeException;
 
-class DadosReferenciaSeeder extends Seeder
+class OrcamentoSeeder extends Seeder
 {
     use WithoutModelEvents;
 
