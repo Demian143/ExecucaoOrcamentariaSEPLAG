@@ -85,8 +85,27 @@ class OrcamentoSeeder extends Seeder
 
         $this->seedNames(NaturezaDespesa::class, $dados['naturezas_despesa']);
         $this->seedNames(FonteRecurso::class, $dados['fontes_recurso']);
-        $this->seedNames(UnidadeGestora::class, $dados['unidades_gestoras_exemplos']);
+        $this->seedUnidadesGestoras($dados['unidades_gestoras_exemplos']);
         $this->seedNames(Fornecedor::class, $dados['fornecedores']);
+    }
+
+    /**
+     * @param  array<int, string>  $names
+     */
+    private function seedUnidadesGestoras(array $names): void
+    {
+        $orgaos = Orgao::query()->get();
+
+        if ($orgaos->isEmpty()) {
+            throw new RuntimeException('Nenhum órgão disponível para associar às unidades gestoras.');
+        }
+
+        foreach ($names as $name) {
+            UnidadeGestora::updateOrCreate(
+                ['nome' => $name],
+                ['orgao_id' => $orgaos->random()->id],
+            );
+        }
     }
 
     /**
