@@ -29,6 +29,13 @@ class Orcamento extends Model
         'revisado_em',
     ];
 
+    protected $appends = [
+        'dotacao_atualizada',
+        'saldo',
+        'percentual_execucao',
+        'inconsistente',
+    ];
+
     public function unidadeGestora(): BelongsTo
     {
         return $this->belongsTo(UnidadeGestora::class);
