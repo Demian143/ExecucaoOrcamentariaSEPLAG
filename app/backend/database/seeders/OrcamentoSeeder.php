@@ -23,6 +23,19 @@ class OrcamentoSeeder extends Seeder
 {
     use WithoutModelEvents;
 
+    private const UNIDADE_GESTORA_ORGAO = [
+        'Gabinete do Secretário' => 'SEPLAG',
+        'Subsecretaria de Gestão' => 'SEPLAG',
+        'Subsecretaria de Planejamento' => 'SEPLAG',
+        'Fundo Estadual de Saúde' => 'SES',
+        'Fundo Estadual de Educação' => 'SEEDUC',
+        'Coordenadoria Regional Metropolitana' => 'SEEDUC',
+        'Coordenadoria Regional Norte' => 'SEEDUC',
+        'Departamento de Administração e Finanças' => 'SEFAZ',
+        'Superintendência de Obras' => 'SEINFRA',
+        'Superintendência de Tecnologia da Informação' => 'SECTI',
+    ];
+
     /**
      * Run the database seeds.
      */
@@ -101,16 +114,21 @@ class OrcamentoSeeder extends Seeder
      */
     private function seedUnidadesGestoras(array $names): void
     {
-        $orgaos = Orgao::query()->get();
+        $orgaos = Orgao::query()->get()->keyBy('sigla');
 
         if ($orgaos->isEmpty()) {
             throw new RuntimeException('Nenhum órgão disponível para associar às unidades gestoras.');
         }
 
         foreach ($names as $name) {
+            $sigla = self::UNIDADE_GESTORA_ORGAO[$name]
+                ?? throw new RuntimeException("Órgão não mapeado para a unidade gestora {$name}.");
+            $orgao = $orgaos->get($sigla)
+                ?? throw new RuntimeException("Órgão {$sigla} não encontrado para a unidade gestora {$name}.");
+
             UnidadeGestora::updateOrCreate(
                 ['nome' => $name],
-                ['orgao_id' => $orgaos->random()->id],
+                ['orgao_id' => $orgao->id],
             );
         }
     }
