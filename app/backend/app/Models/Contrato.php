@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -34,8 +35,13 @@ class Contrato extends Model
     protected function vencido(): Attribute
     {
         return Attribute::make(
-            get: fn (): bool => $this->status !== 'encerrado'
-                && ($this->vigencia_fim?->isPast() ?? false),
+            get: function (): bool {
+                $vigenciaFim = $this->getAttribute('vigencia_fim');
+
+                return $this->status !== 'encerrado'
+                    && $vigenciaFim instanceof CarbonInterface
+                    && $vigenciaFim->isPast();
+            },
         );
     }
 
