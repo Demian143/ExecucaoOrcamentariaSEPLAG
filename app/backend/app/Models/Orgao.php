@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Orgao extends Model
 {
     protected $table = 'orgaos';
+
     protected $fillable = ['nome', 'sigla'];
 
     public function unidadesGestoras(): HasMany
@@ -18,6 +19,6 @@ class Orgao extends Model
 
     public function programas(): BelongsToMany
     {
-        return $this->belongsToMany(Programa::class, 'orgao_programa');
+        return $this->belongsToMany(Programa::class, 'orgao_programa')->withTimestamps();
     }
 }

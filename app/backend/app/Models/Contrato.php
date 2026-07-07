@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -28,6 +29,14 @@ class Contrato extends Model
     public function fornecedor(): BelongsTo
     {
         return $this->belongsTo(Fornecedor::class);
+    }
+
+    protected function vencido(): Attribute
+    {
+        return Attribute::make(
+            get: fn (): bool => $this->status !== 'encerrado'
+                && ($this->vigencia_fim?->isPast() ?? false),
+        );
     }
 
     /**

@@ -3,24 +3,25 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class UnidadeGestora extends Model
 {
     protected $table = 'unidades_gestoras';
+
     protected $fillable = [
-        'nome', 
-        'orgao_id'
-        ];
-    
-    public function acoes(): HasMany
+        'nome',
+        'orgao_id',
+    ];
+
+    public function orgao(): BelongsTo
     {
-        return $this->hasMany(Acao::class);
+        return $this->belongsTo(Orgao::class);
     }
 
-    public function orgaos(): BelongsToMany
+    public function orcamentos(): HasMany
     {
-        return $this->belongsToMany(Orgao::class, 'orgao_programa');
+        return $this->hasMany(Orcamento::class);
     }
 }
