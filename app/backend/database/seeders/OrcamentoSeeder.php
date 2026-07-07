@@ -74,13 +74,14 @@ class OrcamentoSeeder extends Seeder
         }
 
         foreach ($dados['funcoes'] as $funcao) {
-            Funcao::updateOrCreate(
+            $funcaoModel = Funcao::updateOrCreate(
                 ['codigo' => $funcao['codigo']],
-                [
-                    'nome' => $funcao['nome'],
-                    'subfuncoes' => json_encode($funcao['subfuncoes'], JSON_THROW_ON_ERROR),
-                ],
+                ['nome' => $funcao['nome']],
             );
+
+            foreach ($funcao['subfuncoes'] as $subfuncao) {
+                $funcaoModel->subfuncoes()->updateOrCreate(['nome' => $subfuncao]);
+            }
         }
 
         $this->seedNames(NaturezaDespesa::class, $dados['naturezas_despesa']);
