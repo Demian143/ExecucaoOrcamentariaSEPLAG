@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('unidades_gestoras_exemplos');
+        Schema::dropIfExists('unidades_gestoras');
     }
 };

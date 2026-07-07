@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('orcamentos', function (Blueprint $table) {
             $table->id();
             $table->timestamps();
-            $table->unsignedSmallInteger('ano');
+            $table->integer('ano');
             // Quem gasta
             $table->foreignId('unidade_gestora_id')->constrained('unidades_gestoras');
             // Para que
@@ -26,11 +26,12 @@ return new class extends Migration
             // De onde
             $table->foreignId('fonte_recurso_id')->constrained('fontes_recurso');
             // Valores
-            $table->decimal('dotacao_inicial', 15, 2)->default(0);
-            $table->decimal('dotacao_atualizada', 15, 2)->default(0);
-            $table->decimal('valor_empenhado', 15, 2)->default(0);
-            $table->decimal('valor_liquidado', 15, 2)->default(0);
-            $table->decimal('valor_pago', 15, 2)->default(0);
+            $table->decimal('dotacao_inicial', 15, 2)->nullable();
+            $table->decimal('suplementacoes', 15, 2)->nullable();
+            $table->decimal('anulacoes', 15, 2)->nullable();
+            $table->decimal('valor_empenhado', 15, 2)->nullable();
+            $table->decimal('valor_liquidado', 15, 2)->nullable();
+            $table->decimal('valor_pago', 15, 2)->nullable();
         });
     }
 
