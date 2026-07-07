@@ -10,7 +10,7 @@ class Orgao extends Model
 {
     protected $table = 'orgaos';
 
-    protected $fillable = ['nome', 'sigla'];
+    protected $fillable = ['nome', 'sigla', 'status'];
 
     public function unidadesGestoras(): HasMany
     {
