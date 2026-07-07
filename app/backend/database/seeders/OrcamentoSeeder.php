@@ -36,6 +36,12 @@ class OrcamentoSeeder extends Seeder
         'Superintendência de Tecnologia da Informação' => 'SECTI',
     ];
 
+    private const ORGAOS_INATIVOS = [
+        'DER-RJ',
+        'SETUR',
+        'EMOP',
+    ];
+
     /**
      * Run the database seeds.
      */
@@ -61,7 +67,12 @@ class OrcamentoSeeder extends Seeder
         foreach ($dados['orgaos'] as $orgao) {
             Orgao::updateOrCreate(
                 ['sigla' => $orgao['sigla']],
-                ['nome' => $orgao['nome']],
+                [
+                    'nome' => $orgao['nome'],
+                    'status' => in_array($orgao['sigla'], self::ORGAOS_INATIVOS, true)
+                        ? 'inativo'
+                        : 'ativo',
+                ],
             );
         }
 
@@ -188,6 +199,7 @@ class OrcamentoSeeder extends Seeder
             [2000000, 0, 200000, 1500000, 1400000, 1300000],
             [450000, 50000, 25000, null, null, null],
             [650000, 100000, 50000, 700000, 680000, 660000],
+            [400000, 0, 0, 0, 0, 0],
         ];
 
         $orcamentos = collect();
@@ -218,6 +230,7 @@ class OrcamentoSeeder extends Seeder
                     'valor_empenhado' => $valor[3],
                     'valor_liquidado' => $valor[4],
                     'valor_pago' => $valor[5],
+                    'situacao' => $this->situacaoOrcamento($valor),
                     'revisado_por' => $index < 3 ? $revisorId : null,
                     'revisado_em' => $index < 3 && $revisorId !== null ? '2026-07-07 09:00:00' : null,
                 ],
@@ -225,6 +238,38 @@ class OrcamentoSeeder extends Seeder
         }
 
         $this->seedContratos($orcamentos->all());
+    }
+
+    /**
+     * @param  array{0: int|null, 1: int|null, 2: int|null, 3: int|null, 4: int|null, 5: int|null}  $valor
+     */
+    private function situacaoOrcamento(array $valor): string
+    {
+        if (
+            in_array(null, $valor, true)
+            || $valor[5] > $valor[4]
+            || $valor[4] > $valor[3]
+        ) {
+            return 'inconsistente';
+        }
+
+        $dotacaoAtualizada = $valor[0] + $valor[1] - $valor[2];
+
+        if ($valor[3] > $dotacaoAtualizada) {
+            return 'saldo_negativo';
+        }
+
+        if ($valor[3] === 0) {
+            return 'sem_execucao';
+        }
+
+        $percentualExecucao = $dotacaoAtualizada === 0
+            ? 0
+            : ($valor[3] / $dotacaoAtualizada) * 100;
+
+        return $percentualExecucao >= 98
+            ? 'executado'
+            : 'em_execucao';
     }
 
     /**
