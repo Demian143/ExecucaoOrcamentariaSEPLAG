@@ -18,8 +18,6 @@ class DatabaseSeeder extends Seeder
     {
         // User::factory(10)->create();
 
-        $this->call(OrcamentoSeeder::class);
-
         User::updateOrCreate(
             ['email' => 'analista@seplag.rj.gov.br'],
             [
@@ -27,5 +25,7 @@ class DatabaseSeeder extends Seeder
                 'password' => Hash::make('orcamento@2026'),
             ],
         );
+
+        $this->call(OrcamentoSeeder::class);
     }
 }
