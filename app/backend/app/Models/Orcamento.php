@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Orcamento extends Model
 {
@@ -23,6 +24,8 @@ class Orcamento extends Model
         'valor_empenhado',
         'valor_liquidado',
         'valor_pago',
+        'revisado_por',
+        'revisado_em',
     ];
 
     public function unidadeGestora(): BelongsTo
@@ -55,6 +58,16 @@ class Orcamento extends Model
         return $this->belongsTo(FonteRecurso::class);
     }
 
+    public function revisor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'revisado_por');
+    }
+
+    public function contratos(): HasMany
+    {
+        return $this->hasMany(Contrato::class);
+    }
+
     protected function saldo(): Attribute
     {
         return Attribute::make(
@@ -74,6 +87,7 @@ class Orcamento extends Model
             'valor_empenhado' => 'decimal:2',
             'valor_liquidado' => 'decimal:2',
             'valor_pago' => 'decimal:2',
+            'revisado_em' => 'datetime',
         ];
     }
 }
