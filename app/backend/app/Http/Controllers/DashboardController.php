@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\DashboardService;
+use App\Services\Dashboard\DashboardService;
 use Illuminate\Http\JsonResponse;
 
 class DashboardController extends Controller
