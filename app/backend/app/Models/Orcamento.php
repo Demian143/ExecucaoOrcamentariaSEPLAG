@@ -25,6 +25,7 @@ class Orcamento extends Model
         'valor_empenhado',
         'valor_liquidado',
         'valor_pago',
+        'situacao',
         'revisado_por',
         'revisado_em',
     ];

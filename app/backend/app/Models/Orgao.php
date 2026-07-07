@@ -12,6 +12,10 @@ class Orgao extends Model
 
     protected $fillable = ['nome', 'sigla', 'status'];
 
+    protected $attributes = [
+        'status' => 'ativo',
+    ];
+
     public function unidadesGestoras(): HasMany
     {
         return $this->hasMany(UnidadeGestora::class);
