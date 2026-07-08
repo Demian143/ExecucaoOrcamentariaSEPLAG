@@ -3,6 +3,7 @@
 namespace App\Services\Orcamento;
 
 use App\Models\Orcamento;
+use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrcamentoService
@@ -13,8 +14,7 @@ class OrcamentoService
 
     public function listOrcamentos(
         OrcamentoFilters $filters,
-    ): LengthAwarePaginator 
-    {
+    ): LengthAwarePaginator {
         $query = $this->orcamento->newQuery()
             ->with(['unidadeGestora.orgao', 'programa', 'acao'])
             ->orderByDesc('id');
@@ -56,5 +56,15 @@ class OrcamentoService
             perPage: min(max($filters->perPage, 1), 100),
             page: max(1, $filters->page),
         );
+    }
+
+    public function revisar(Orcamento $orcamento, User $analista): Orcamento
+    {
+        $orcamento->update([
+            'revisado_por' => $analista->id,
+            'revisado_em' => now(),
+        ]);
+
+        return $orcamento->refresh()->load('revisor');
     }
 }

@@ -15,6 +15,7 @@ Route::get('/user', function (Request $request) {
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth:api');
 Route::get('/orgaos', [OrgaoController::class, 'index'])->middleware('auth:api');
 Route::get('/orcamentos', [OrcamentoController::class, 'index'])->middleware('auth:api');
+Route::patch('/orcamentos/{orcamento}/revisao', [OrcamentoController::class, 'revisar'])->middleware('auth:api');
 Route::get('/contratos', [ContratoController::class, 'index'])->middleware('auth:api');
 
 Route::prefix('auth')->group(function () {

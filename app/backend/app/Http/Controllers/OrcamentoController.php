@@ -3,8 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ListOrcamentosRequest;
+use App\Models\Orcamento;
+use App\Models\User;
 use App\Services\Orcamento\OrcamentoService;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class OrcamentoController extends Controller
 {
@@ -17,5 +21,26 @@ class OrcamentoController extends Controller
         $orcamentos = $this->orcamentoService->listOrcamentos($request->filters());
 
         return response()->json($orcamentos);
+    }
+
+    public function revisar(Request $request, Orcamento $orcamento): JsonResponse
+    {
+        $orcamento = $this->orcamentoService->revisar(
+            $orcamento,
+            $this->analista($request),
+        );
+
+        return response()->json($orcamento);
+    }
+
+    private function analista(Request $request): User
+    {
+        $user = $request->user();
+
+        if (! $user instanceof User) {
+            throw new AuthenticationException;
+        }
+
+        return $user;
     }
 }
