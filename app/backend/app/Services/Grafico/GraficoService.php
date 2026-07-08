@@ -3,12 +3,14 @@
 namespace App\Services\Grafico;
 
 use App\Models\Orcamento;
+use App\Models\Contrato;
 use Illuminate\Support\Collection;
 
 class GraficoService 
 {
     public function __construct(
-        private readonly Orcamento $orcamento
+        private readonly Orcamento $orcamento,
+        private readonly Contrato $contrato
     ) {}
 
     /**
@@ -63,4 +65,28 @@ class GraficoService
                 return $item;
             });
     }
+
+    public function empenhadoVsPago()
+    {   
+        // Consolida os totais gerais acumulados de valores empenhados, liquidados e pagos de todo o estado.
+        // O resultado condensa toda a base em um único objeto comparativo para alimentar o gráfico de barras.
+        return $this->orcamento
+            ->selectRaw('
+                SUM(valor_empenhado) as total_empenhado,
+                SUM(valor_liquidado) as total_liquidado,
+                SUM(valor_pago) as total_pago
+            ')
+            ->first(); // Retorna apenas um objeto com os três totais acumulados
+    }
+
+    public function topContratos()
+    {
+        return $this->contrato->query()
+            ->with(['fornecedor', 'orcamento.unidadeGestora.orgao']) // Traz os dados relacionados sem sobrecarregar o banco
+            ->orderBy('valor', 'desc')
+            ->limit(10)
+            ->get();
+    }
+
+    
 }
