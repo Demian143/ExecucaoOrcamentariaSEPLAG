@@ -3,15 +3,22 @@
 namespace App\Services\Grafico;
 
 use App\Models\Orcamento;
+use Illuminate\Support\Collection;
 
-class GraficoService {
+class GraficoService 
+{
     public function __construct(
         private readonly Orcamento $orcamento
     ) {}
 
-    public function execucaoPrograma() {
-        // Aqui traz somas totais baseadas em cada programa, para que seja possível gerar o gráfico de execução por programa
-        // Um programa pode ter varios orçamentos, 
+    /**
+     * Calcula o total financeiro e o percentual de execução agrupado por Programa.
+     * Consolida múltiplos orçamentos para gerar o gráfico de "Execução por Programa".
+     *
+     * @return Collection
+     */
+    public function execucaoPrograma(): Collection
+    {
         return $this->orcamento
             ->join('programas', 'orcamentos.programa_id', '=', 'programas.id')
             ->selectRaw('
@@ -21,20 +28,39 @@ class GraficoService {
             ')
             ->groupBy('programas.id', 'programas.nome')
             ->get()
-            ->map(
-                function ($item) {
-                    $item->percentual_empenhado = $item->dotacao_atualizada > 0 ? 
-                    round(($item->total_empenhado / $item->dotacao_atualizada) * 100, 2) 
+            ->map(function ($item) {
+                // Injeta o percentual de comprometimento do orçamento do programa com despesas
+                $item->percentual_empenhado = $item->dotacao_atualizada > 0 
+                    ? round(($item->total_empenhado / $item->dotacao_atualizada) * 100, 2) 
                     : 0;
-                    return $item;
-                }
-            );
-
+                return $item;
+            });
     }
 
-    public function execucaoOrgao() {
-        $query = $this->orcamento;
-        $query->join('unidades_gestoras', 'orcamentos.unidade_gestora_id', '=', 'unidades_gestoras.id');
-        $query->join('','','=','');
+    /**
+     * Calcula o total financeiro e o percentual de execução agrupado por Órgão.
+     * Navega pela hierarquia Orçamento -> Unidade Gestora -> Órgão para consolidar os dados.
+     *
+     * @return Collection
+     */
+    public function execucaoOrgao(): Collection
+    {
+        return $this->orcamento
+            ->join('unidades_gestoras', 'orcamentos.unidade_gestora_id', '=', 'unidades_gestoras.id')
+            ->join('orgaos', 'unidades_gestoras.orgao_id', '=', 'orgaos.id')
+            ->selectRaw('
+                orgaos.sigla as sigla_orgao,
+                SUM(dotacao_inicial + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)) as dotacao_atualizada,
+                SUM(valor_empenhado) as total_empenhado     
+            ')
+            ->groupBy('orgaos.id', 'orgaos.sigla')
+            ->get()
+            ->map(function ($item) {
+                // Injeta o percentual de comprometimento do orçamento do órgão com despesas
+                $item->percentual_execucao = $item->dotacao_atualizada > 0 
+                    ? round(($item->total_empenhado / $item->dotacao_atualizada) * 100, 2) 
+                    : 0;
+                return $item;
+            });
     }
 }
