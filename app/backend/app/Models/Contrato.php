@@ -22,6 +22,8 @@ class Contrato extends Model
         'fornecedor_id',
     ];
 
+    protected $appends = ['vencido'];
+
     public function orcamento(): BelongsTo
     {
         return $this->belongsTo(Orcamento::class);
