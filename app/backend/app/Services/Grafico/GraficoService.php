@@ -14,7 +14,7 @@ class GraficoService
     /**
      * Calcula o total financeiro e o percentual de execução agrupado por Programa.
      * Consolida múltiplos orçamentos para gerar o gráfico de "Execução por Programa".
-     *
+     *  
      * @return Collection
      */
     public function execucaoPrograma(): Collection
@@ -38,8 +38,8 @@ class GraficoService
     }
 
     /**
-     * Calcula o total financeiro e o percentual de execução agrupado por Órgão.
-     * Navega pela hierarquia Orçamento -> Unidade Gestora -> Órgão para consolidar os dados.
+     * Calcula o montante total financeiro e o percentual de despesas pagas agrupado por Órgão.
+     * O resultado reflete quantos por cento do orçamento total de cada órgão foi efetivamente pago.
      *
      * @return Collection
      */
