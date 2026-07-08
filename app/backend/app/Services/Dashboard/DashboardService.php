@@ -9,13 +9,22 @@ use App\Models\Orgao;
 class DashboardService
 {
     public function __construct(
-        private Orgao $orgao,
-        private Contrato $contrato,
-        private Orcamento $orcamento,
+        private readonly Orgao $orgao,
+        private readonly Contrato $contrato,
+        private readonly Orcamento $orcamento,
     ) {}
 
     /**
-     * @return array<string, float>
+     * @return array{
+     *     total_orgaos: int,
+     *     total_contratos: int,
+     *     orcamento_total: float,
+     *     empenhado: float,
+     *     liquidado: float,
+     *     pago: float,
+     *     saldo: float,
+     *     percentual_execucao: float
+     * }
      */
     public function index(): array
     {
@@ -31,14 +40,14 @@ class DashboardService
         ];
     }
 
-    public function totalOrgaos(): float
+    public function totalOrgaos(): int
     {
-        return (float) $this->orgao->newQuery()->count();
+        return $this->orgao->newQuery()->count();
     }
 
-    public function totalContratos(): float
+    public function totalContratos(): int
     {
-        return (float) $this->contrato->newQuery()->count();
+        return $this->contrato->newQuery()->count();
     }
 
     public function totalEmpenhado(): float
