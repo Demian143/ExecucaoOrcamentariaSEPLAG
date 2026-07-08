@@ -88,5 +88,17 @@ class GraficoService
             ->get();
     }
 
-    
+    public function evolucaoMensal()
+    {
+        return $this->contrato->query()
+            // Filtra apenas os contratos do ano atual
+            ->whereYear('data_assinatura', date('Y')) 
+            ->selectRaw('
+                MONTH(data_assinatura) as mes,
+                SUM(valor) as total_mes
+            ')
+            ->groupByRaw('MONTH(data_assinatura)')
+            ->orderBy('mes', 'asc')
+            ->get();
+    }
 }
