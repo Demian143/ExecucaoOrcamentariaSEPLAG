@@ -2,26 +2,20 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+use App\Http\Requests\ListOrgaosRequest;
 use App\Services\Orgao\OrgaoService;
+use Illuminate\Http\JsonResponse;
 
 class OrgaoController extends Controller
 {
     public function __construct(
-        private readonly OrgaoService $orgaoService
-    ){}
+        private readonly OrgaoService $orgaoService,
+    ) {}
 
-    public function index(Request $request)
+    public function index(ListOrgaosRequest $request): JsonResponse
     {
-        $nome = $request->query('nome');
-        $sigla = $request->query('sigla');
-        $status = $request->query('status');
-        $per_page = (int) $request->query('per_page', 10);
-        $page = (int) $request->query('page', 1);
+        $orgaos = $this->orgaoService->listOrgaos($request->filters());
 
-        return response()->json(
-            $this->orgaoService->listOrgaos($nome, $sigla, $status, $per_page, $page),
-            200);
-
+        return response()->json($orgaos);
     }
 }

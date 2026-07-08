@@ -1,40 +1,35 @@
 <?php
+
 namespace App\Services\Orgao;
 
 use App\Models\Orgao;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class OrgaoService
 {
     public function __construct(
-        private Orgao $orgao
-    ){}
+        private readonly Orgao $orgao,
+    ) {}
 
-    public function listOrgaos(
-        ?string $nome = null, 
-        ?string $sigla = null, 
-        ?string $status = null,
-        int $per_page = 10,
-        int $page = 1,
-    ) {
-        $query = $this->orgao->query();
+    public function listOrgaos(OrgaoFilters $filters): LengthAwarePaginator
+    {
+        $query = $this->orgao->newQuery()->orderBy('nome');
 
-        if ($nome) {
-            $query->where('nome', 'like', "%$nome%");
+        if ($filters->nome !== null) {
+            $query->where('nome', 'ilike', "%{$filters->nome}%");
         }
 
-        if ($sigla) {
-            $query->where('sigla', 'like', "%$sigla%");
+        if ($filters->sigla !== null) {
+            $query->where('sigla', 'ilike', "%{$filters->sigla}%");
         }
 
-        if ($status) {
-            $query->where('status', $status);
+        if ($filters->status !== null) {
+            $query->where('status', $filters->status);
         }
 
         return $query->paginate(
-            min(max($per_page, 1), 100), 
-            ['*'], 
-            'page', 
-            max(1, $page)
+            perPage: min(max($filters->perPage, 1), 100),
+            page: max(1, $filters->page),
         );
     }
 }
