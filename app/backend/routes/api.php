@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ContratoController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\GraficoController;
 use App\Http\Controllers\OrcamentoController;
 use App\Http\Controllers\OrgaoController;
 use Illuminate\Http\Request;
@@ -13,6 +14,7 @@ Route::get('/user', function (Request $request) {
 })->middleware('auth:api');
 
 Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('auth:api');
+Route::get('/graficos', [GraficoController::class, 'index'])->middleware('auth:api');
 Route::get('/orgaos', [OrgaoController::class, 'index'])->middleware('auth:api');
 Route::get('/orcamentos', [OrcamentoController::class, 'index'])->middleware('auth:api');
 Route::patch('/orcamentos/{orcamento}/revisao', [OrcamentoController::class, 'revisar'])->middleware('auth:api');

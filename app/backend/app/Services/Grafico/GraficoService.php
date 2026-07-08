@@ -2,103 +2,124 @@
 
 namespace App\Services\Grafico;
 
-use App\Models\Orcamento;
 use App\Models\Contrato;
+use App\Models\Orcamento;
 use Illuminate\Support\Collection;
 
-class GraficoService 
+class GraficoService
 {
     public function __construct(
         private readonly Orcamento $orcamento,
-        private readonly Contrato $contrato
+        private readonly Contrato $contrato,
     ) {}
 
     /**
-     * Calcula o total financeiro e o percentual de execução agrupado por Programa.
-     * Consolida múltiplos orçamentos para gerar o gráfico de "Execução por Programa".
-     *  
-     * @return Collection
+     * @return array{
+     *     execucao_por_orgao: Collection,
+     *     execucao_por_programa: Collection,
+     *     empenhado_vs_pago: object|null,
+     *     top_10_contratos: Collection,
+     *     evolucao_mensal: Collection
+     * }
+     */
+    public function index(): array
+    {
+        return [
+            'execucao_por_orgao' => $this->execucaoOrgao(),
+            'execucao_por_programa' => $this->execucaoPrograma(),
+            'empenhado_vs_pago' => $this->empenhadoVsPago(),
+            'top_10_contratos' => $this->topContratos(),
+            'evolucao_mensal' => $this->evolucaoMensal(),
+        ];
+    }
+
+    /**
+     * @return Collection<int, object>
      */
     public function execucaoPrograma(): Collection
     {
-        return $this->orcamento
+        return $this->orcamento->newQuery()
             ->join('programas', 'orcamentos.programa_id', '=', 'programas.id')
             ->selectRaw('
                 programas.nome as nome_programa,
-                SUM(dotacao_inicial + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)) as dotacao_atualizada,
-                SUM(valor_empenhado) as total_empenhado 
+                SUM(COALESCE(dotacao_inicial, 0) + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)) as dotacao_atualizada,
+                SUM(COALESCE(valor_empenhado, 0)) as total_empenhado
             ')
             ->groupBy('programas.id', 'programas.nome')
+            ->toBase()
             ->get()
-            ->map(function ($item) {
-                // Injeta o percentual de comprometimento do orçamento do programa com despesas
-                $item->percentual_empenhado = $item->dotacao_atualizada > 0 
-                    ? round(($item->total_empenhado / $item->dotacao_atualizada) * 100, 2) 
+            ->map(function (object $programa): object {
+                $programa->percentual_empenhado = $programa->dotacao_atualizada > 0
+                    ? round(($programa->total_empenhado / $programa->dotacao_atualizada) * 100, 2)
                     : 0;
-                return $item;
+
+                return $programa;
             });
     }
 
     /**
-     * Calcula o montante total financeiro e o percentual de despesas pagas agrupado por Órgão.
-     * O resultado reflete quantos por cento do orçamento total de cada órgão foi efetivamente pago.
-     *
-     * @return Collection
+     * @return Collection<int, object>
      */
     public function execucaoOrgao(): Collection
     {
-        return $this->orcamento
+        return $this->orcamento->newQuery()
             ->join('unidades_gestoras', 'orcamentos.unidade_gestora_id', '=', 'unidades_gestoras.id')
             ->join('orgaos', 'unidades_gestoras.orgao_id', '=', 'orgaos.id')
             ->selectRaw('
                 orgaos.sigla as sigla_orgao,
-                SUM(dotacao_inicial + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)) as dotacao_atualizada,
-                SUM(valor_empenhado) as total_empenhado     
+                SUM(COALESCE(dotacao_inicial, 0) + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)) as dotacao_atualizada,
+                SUM(COALESCE(valor_empenhado, 0)) as total_empenhado
             ')
             ->groupBy('orgaos.id', 'orgaos.sigla')
+            ->toBase()
             ->get()
-            ->map(function ($item) {
-                // Injeta o percentual de comprometimento do orçamento do órgão com despesas
-                $item->percentual_execucao = $item->dotacao_atualizada > 0 
-                    ? round(($item->total_empenhado / $item->dotacao_atualizada) * 100, 2) 
+            ->map(function (object $orgao): object {
+                $orgao->percentual_execucao = $orgao->dotacao_atualizada > 0
+                    ? round(($orgao->total_empenhado / $orgao->dotacao_atualizada) * 100, 2)
                     : 0;
-                return $item;
+
+                return $orgao;
             });
     }
 
-    public function empenhadoVsPago()
-    {   
-        // Consolida os totais gerais acumulados de valores empenhados, liquidados e pagos de todo o estado.
-        // O resultado condensa toda a base em um único objeto comparativo para alimentar o gráfico de barras.
-        return $this->orcamento
+    public function empenhadoVsPago(): ?object
+    {
+        return $this->orcamento->newQuery()
             ->selectRaw('
-                SUM(valor_empenhado) as total_empenhado,
-                SUM(valor_liquidado) as total_liquidado,
-                SUM(valor_pago) as total_pago
+                SUM(COALESCE(valor_empenhado, 0)) as total_empenhado,
+                SUM(COALESCE(valor_liquidado, 0)) as total_liquidado,
+                SUM(COALESCE(valor_pago, 0)) as total_pago
             ')
-            ->first(); // Retorna apenas um objeto com os três totais acumulados
+            ->toBase()
+            ->first();
     }
 
-    public function topContratos()
+    /**
+     * @return Collection<int, Contrato>
+     */
+    public function topContratos(): Collection
     {
-        return $this->contrato->query()
-            ->with(['fornecedor', 'orcamento.unidadeGestora.orgao']) // Traz os dados relacionados sem sobrecarregar o banco
-            ->orderBy('valor', 'desc')
+        return $this->contrato->newQuery()
+            ->with(['fornecedor', 'orcamento.unidadeGestora.orgao'])
+            ->orderByDesc('valor')
             ->limit(10)
             ->get();
     }
 
-    public function evolucaoMensal()
+    /**
+     * @return Collection<int, object>
+     */
+    public function evolucaoMensal(): Collection
     {
-        return $this->contrato->query()
-            // Filtra apenas os contratos do ano atual
-            ->whereYear('data_assinatura', date('Y')) 
+        return $this->contrato->newQuery()
+            ->whereYear('vigencia_inicio', today()->year)
             ->selectRaw('
-                MONTH(data_assinatura) as mes,
+                EXTRACT(MONTH FROM vigencia_inicio)::int as mes,
                 SUM(valor) as total_mes
             ')
-            ->groupByRaw('MONTH(data_assinatura)')
-            ->orderBy('mes', 'asc')
+            ->groupByRaw('EXTRACT(MONTH FROM vigencia_inicio)')
+            ->orderBy('mes')
+            ->toBase()
             ->get();
     }
 }
