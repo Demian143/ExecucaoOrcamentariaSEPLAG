@@ -10,7 +10,7 @@ class OrcamentoService
         private readonly Orcamento $orcamento
     ) {}
 
-    public function index(
+    public function listOrcamentos(
         ?int $orgaoId = null,
         ?int $programaId = null,
         ?int $acaoId = null,
@@ -22,7 +22,7 @@ class OrcamentoService
         int $page = 1,
     ) {
         $query = $this->orcamento->newQuery();
-        
+
         $dotacaoAtualizadaSql = '(dotacao_inicial + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0))';
         $percentualSql = "CASE WHEN {$dotacaoAtualizadaSql} > 0 THEN (valor_empenhado / {$dotacaoAtualizadaSql}) * 100 ELSE 0 END";
 
