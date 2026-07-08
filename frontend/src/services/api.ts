@@ -11,10 +11,12 @@ import type {
   PaginatedResponse,
 } from "./types";
 
+const API_BASE_URL: string = import.meta.env.VITE_API_BASE_URL ?? "";
+
 class ApiService {
   private client: AxiosInstance;
 
-  constructor(baseUrl: string) {
+  constructor(baseUrl: string = API_BASE_URL) {
     this.client = axios.create({
       baseURL: baseUrl,
     });
