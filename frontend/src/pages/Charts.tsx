@@ -3,17 +3,14 @@ import ExecucaoPorOrgao from '../components/charts/ExecucaoPorOrgao';
 import EvolucaoMensalChart from '../components/charts/EvolucaoMensalChart';
 
 function Charts() {
-    
     return (
-        <div>
-            <ChartCard 
-                title='Execução por programa'
-                children={<ExecucaoPorOrgao/>}
-                />
-            <ChartCard 
-                title='Evolução Mensal'
-                children={<EvolucaoMensalChart/>}
-                />
+        <div className="space-y-4">
+            <ChartCard title="Execução por órgão">
+                <ExecucaoPorOrgao />
+            </ChartCard>
+            <ChartCard title="Evolução mensal">
+                <EvolucaoMensalChart />
+            </ChartCard>
         </div>
     );
 }
