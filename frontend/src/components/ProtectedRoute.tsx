@@ -1,4 +1,5 @@
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate } from 'react-router-dom';
+import DashboardLayout from './DashboardLayout';
 import authStore from '../store/authStore';
 
 export const ProtectedRoute = () => {
@@ -8,5 +9,5 @@ export const ProtectedRoute = () => {
     return <Navigate to="/login" replace />;
   }
 
-  return <Outlet />;
+  return <DashboardLayout />;
 };
