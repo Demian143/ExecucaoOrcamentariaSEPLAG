@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
-import { type GraficosResponse } from '../../services/types';
-import ApiService from '../../services/api';
+import { type ExecucaoPorOrgao } from '../../services/types';
 import {
     BarChart,
     Bar,
@@ -11,20 +9,11 @@ import {
     Legend,
 } from 'recharts';
 
-function ExecucaoPorOrgao() {
-    // Observar uma possivel refatoração para receber apenas os dados ao inves de recarrecar em cada componente
-    const api = useMemo(() => new ApiService(), []);
-    const [graficos, setGraficos] = useState<GraficosResponse>();
+type ExecucaoPorOrgaoChartProps = {
+    data: ExecucaoPorOrgao[];
+};
 
-    useEffect(() => {
-        const carregarDados = async () => {
-            const response = await api.getGraficos();
-            setGraficos(response);
-        };
-
-        carregarDados();
-    }, [api]);
-
+function ExecucaoPorOrgaoChart({ data }: ExecucaoPorOrgaoChartProps) {
     const formatCurrency = (value: number) =>
         new Intl.NumberFormat('pt-BR', {
             notation: 'compact',
@@ -35,7 +24,7 @@ function ExecucaoPorOrgao() {
         <BarChart
             responsive
             style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
-            data={graficos?.execucao_por_orgao}
+            data={data}
         >
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey={'sigla_orgao'} />
@@ -50,4 +39,4 @@ function ExecucaoPorOrgao() {
     );
 }
 
-export default ExecucaoPorOrgao;
+export default ExecucaoPorOrgaoChart;

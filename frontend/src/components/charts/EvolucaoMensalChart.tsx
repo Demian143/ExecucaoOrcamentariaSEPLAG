@@ -1,6 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
 import { type EvolucaoMensal } from '../../services/types';
-import ApiService from '../../services/api';
 import {
     Area,
     AreaChart,
@@ -10,18 +8,18 @@ import {
     YAxis,
 } from 'recharts';
 
-function EvolucaoMensalChart() {
-    const api = useMemo(() => new ApiService(), []);
-    const [graficos, setGraficos] = useState<EvolucaoMensal[]>();
+type EvolucaoMensalChartProps = {
+    data: EvolucaoMensal[];
+};
 
-    useEffect(() => {
-        const carregarDados = async () => {
-            const response = await api.getGraficos();
-            setGraficos(response.evolucao_mensal);
-        };
-
-        carregarDados();
-    }, [api]);
+function EvolucaoMensalChart({ data }: EvolucaoMensalChartProps) {
+    // Ajustar dado vindo do backend para melhora na resposta.
+    // Devo receber para um grafico melhor:
+    // export type EvolucaoMensal = {
+    //     mes: number;
+    //     total_empenhado: ApiNumeric;
+    //     total_pago: ApiNumeric;
+    //   };
 
     const formatCurrency = (value: number | string) =>
         new Intl.NumberFormat('pt-BR', {
@@ -38,7 +36,7 @@ function EvolucaoMensalChart() {
         <AreaChart
             style={{ width: '100%', maxWidth: '700px', maxHeight: '70vh', aspectRatio: 1.618 }}
             responsive
-            data={graficos}
+            data={data}
             margin={{ top: 10, right: 24, left: 0, bottom: 0 }}
         >
             <defs>
