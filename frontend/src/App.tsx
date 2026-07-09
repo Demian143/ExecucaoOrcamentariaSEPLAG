@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ProtectedRoute } from './components/ProtectedRoute';
 import Home from './pages/Home';
 import Login from './pages/Login';
+import Charts from './pages/Charts';
 
 function PlaceholderPage({ title }: { title: string }) {
   return (
@@ -21,7 +22,7 @@ function App() {
         <Route element={<ProtectedRoute />}> 
           <Route path='/home' element={<Home />} />
           <Route path='/orcamentos' element={<PlaceholderPage title="Orçamentos" />} />
-          <Route path='/graficos' element={<PlaceholderPage title="Gráficos" />} />
+          <Route path='/graficos' element={<Charts />} />
         </Route>
       </Routes>
     </BrowserRouter>
