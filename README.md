@@ -2,6 +2,12 @@
 
 Aplicação monorepo para consulta e análise da execução orçamentária, composta por uma API Laravel, uma interface React e banco PostgreSQL.
 
+## Deploy
+
+O backend está implantado no Render. O projeto pode ser acessado e gerenciado pelo [painel do Render](https://dashboard.render.com/project/prj-d98m35gk1i2s73crp00g).
+
+O frontend está disponível em [execucao-orcamentaria-seplag-frontend-9gdiw5kmk.vercel.app](https://execucao-orcamentaria-seplag-frontend-9gdiw5kmk.vercel.app/).
+
 ## Como executar localmente
 
 ### Requisitos
@@ -145,6 +151,8 @@ No backend, controllers tratam HTTP, Form Requests concentram validação, servi
 ### PostgreSQL
 
 O PostgreSQL foi escolhido pela robustez relacional, integridade por chaves estrangeiras e recursos de consulta e agregação adequados ao domínio orçamentário. Embora o banco também ofereça arrays e JSONB, essas capacidades não fundamentam a modelagem atual: funções, subfunções, programas, ações, naturezas e fontes foram normalizados em tabelas próprias. Essa normalização evita dados repetidos e torna filtros, agrupamentos e relacionamentos explícitos.
+
+Além da adequação ao domínio relacional, o PostgreSQL possui suporte gerenciado em plataformas de implantação como Railway e Render. Isso simplifica o provisionamento, a persistência dos dados, os backups e uma eventual migração entre provedores, reforçando sua conveniência operacional para a publicação da aplicação sem substituir os critérios técnicos que fundamentam a escolha.
 
 ### Modelagem orçamentária
 
