@@ -112,10 +112,12 @@ class GraficoService
     public function evolucaoMensal(): Collection
     {
         return $this->contrato->newQuery()
+            ->join('orcamentos', 'contratos.orcamento_id', '=', 'orcamentos.id')
             ->whereYear('vigencia_inicio', today()->year)
             ->selectRaw('
                 EXTRACT(MONTH FROM vigencia_inicio)::int as mes,
-                SUM(valor) as total_mes
+                SUM(COALESCE(orcamentos.valor_empenhado, 0)) as total_empenhado,
+                SUM(COALESCE(orcamentos.valor_pago, 0)) as total_pago
             ')
             ->groupByRaw('EXTRACT(MONTH FROM vigencia_inicio)')
             ->orderBy('mes')
