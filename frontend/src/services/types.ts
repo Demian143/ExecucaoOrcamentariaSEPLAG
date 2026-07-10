@@ -74,6 +74,29 @@ export type Acao = {
   updated_at: string | null;
 };
 
+export type Funcao = {
+  id: number;
+  nome: string;
+  codigo: string;
+};
+
+export type Subfuncao = {
+  id: number;
+  nome: string;
+  funcao_id: number;
+  funcao?: Funcao | null;
+};
+
+export type NaturezaDespesa = {
+  id: number;
+  nome: string;
+};
+
+export type FonteRecurso = {
+  id: number;
+  nome: string;
+};
+
 export type UnidadeGestora = {
   id: number;
   nome: string;
@@ -109,15 +132,20 @@ export type Orcamento = {
   situacao: OrcamentoSituacao;
   revisado_por: number | null;
   revisado_em: string | null;
+  observacao: string | null;
   created_at: string | null;
   updated_at: string | null;
   dotacao_atualizada: number;
   saldo: number;
   percentual_execucao: number | null;
   inconsistente: boolean;
-  unidade_gestora?: UnidadeGestora;
-  programa?: Programa;
-  acao?: Acao;
+  unidade_gestora?: UnidadeGestora | null;
+  programa?: Programa | null;
+  acao?: Acao | null;
+  subfuncao?: Subfuncao | null;
+  natureza_despesa?: NaturezaDespesa | null;
+  fonte_recurso?: FonteRecurso | null;
+  contratos?: Contrato[];
   revisor?: User | null;
 };
 
@@ -176,7 +204,7 @@ export type Contrato = {
   numero: string;
   objeto: string;
   valor: ApiNumeric;
-  status: string;
+  status: "vigente" | "encerrado" | "suspenso";
   vigencia_inicio: string;
   vigencia_fim: string;
   orcamento_id: number;
