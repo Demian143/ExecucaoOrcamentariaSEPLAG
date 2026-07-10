@@ -1,4 +1,4 @@
-import { type FormEvent, useState } from 'react';
+import { type SubmitEvent, useState } from 'react';
 import { type Orcamento } from '../../services/types';
 import { UnavailableValue } from './UnavailableValue';
 
@@ -24,7 +24,7 @@ export function OrcamentoReviewPanel({
 }: OrcamentoReviewPanelProps) {
   const [observacao, setObservacao] = useState('');
 
-  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: SubmitEvent<HTMLFormElement>) {
     event.preventDefault();
     await onSubmit(observacao.trim());
   }
