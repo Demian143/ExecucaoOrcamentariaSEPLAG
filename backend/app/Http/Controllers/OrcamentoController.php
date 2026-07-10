@@ -24,6 +24,13 @@ class OrcamentoController extends Controller
         return response()->json($orcamentos);
     }
 
+    public function show(int $orcamento): JsonResponse
+    {
+        return response()->json(
+            $this->orcamentoService->findOrcamento($orcamento)
+        );
+    }
+
     public function revisar(RevisarOrcamentoRequest $request, Orcamento $orcamento): JsonResponse
     {
         $orcamento = $this->orcamentoService->revisar(

@@ -58,6 +58,22 @@ class OrcamentoService
         );
     }
 
+    public function findOrcamento(int $id): Orcamento
+    {
+        return $this->orcamento->newQuery()
+            ->with([
+                'unidadeGestora.orgao',
+                'programa',
+                'acao',
+                'subfuncao.funcao',
+                'naturezaDespesa',
+                'fonteRecurso',
+                'contratos.fornecedor',
+                'revisor',
+            ])
+            ->findOrFail($id);
+    }
+
     public function revisar(Orcamento $orcamento, User $analista, string $observacao): Orcamento
     {
         $orcamento->update([

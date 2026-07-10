@@ -17,6 +17,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 Route::get('/graficos', [GraficoController::class, 'index'])->middleware('auth:api');
 Route::get('/orgaos', [OrgaoController::class, 'index'])->middleware('auth:api');
 Route::get('/orcamentos', [OrcamentoController::class, 'index'])->middleware('auth:api');
+Route::get('/orcamentos/{orcamento}', [OrcamentoController::class, 'show'])->middleware('auth:api');
 Route::patch('/orcamentos/{orcamento}/revisao', [OrcamentoController::class, 'revisar'])->middleware('auth:api');
 Route::get('/contratos', [ContratoController::class, 'index'])->middleware('auth:api');
 
