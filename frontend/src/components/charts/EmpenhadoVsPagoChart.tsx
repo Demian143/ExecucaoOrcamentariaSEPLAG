@@ -12,6 +12,12 @@ type EmpenhadoVsPagoProps = {
     data: EmpenhadoVsPago
 };
 
+const chartColors = {
+    empenhado: '#3B82F6',
+    liquidado: '#F59E0B',
+    pago: '#10B981',
+};
+
 function EmpenhadoVsPagoChart({ data }: EmpenhadoVsPagoProps) {
     const formatCurrency = (value: number | string) =>
         new Intl.NumberFormat('pt-BR', {
@@ -20,9 +26,9 @@ function EmpenhadoVsPagoChart({ data }: EmpenhadoVsPagoProps) {
         }).format(Number(value));
 
     const chartData = [
-        { categoria: 'Empenhado', valor: Number(data.total_empenhado ?? 0), fill: '#8884d8' },
-        { categoria: 'Liquidado', valor: Number(data.total_liquidado ?? 0), fill: '#82ca9d' },
-        { categoria: 'Pago', valor: Number(data.total_pago ?? 0), fill: '#0056A4' },
+        { categoria: 'Empenhado', valor: Number(data.total_empenhado ?? 0), fill: chartColors.empenhado },
+        { categoria: 'Liquidado', valor: Number(data.total_liquidado ?? 0), fill: chartColors.liquidado },
+        { categoria: 'Pago', valor: Number(data.total_pago ?? 0), fill: chartColors.pago },
     ];
 
     return (
