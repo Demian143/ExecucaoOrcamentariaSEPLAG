@@ -12,14 +12,6 @@ Aplicação monorepo para consulta e análise da execução orçamentária, comp
 
 ### Banco de dados
 
-Para iniciar somente o PostgreSQL e o Adminer:
-
-```bash
-docker compose up -d
-```
-
-O PostgreSQL fica disponível em `localhost:5432`, com banco, usuário e senha definidos no `docker-compose.yml`. O Adminer fica disponível em `http://localhost:8080`.
-
 Configure o arquivo `backend/.env` para usar PostgreSQL:
 
 ```env
@@ -65,13 +57,21 @@ O endereço do frontend é informado pelo Vite ao iniciar o servidor.
 
 ## Como utilizar Docker
 
-Para construir e iniciar automaticamente o backend, o frontend, o PostgreSQL e o Adminer:
+Na raiz do projeto, execute:
 
 ```bash
-docker compose up -d --build
+docker compose up
 ```
 
-Ao iniciar, o backend aguarda o banco ficar disponível, executa automaticamente as migrations e os seeders e, em seguida, disponibiliza a API. Os seeders usam `updateOrCreate`, permitindo novas execuções sem duplicar os registros centrais. Não é necessário criar arquivos `.env` nem executar comandos adicionais para iniciar o ambiente Docker.
+Esse único comando constrói e inicia automaticamente:
+
+- backend Laravel;
+- frontend React;
+- banco PostgreSQL;
+- migrations;
+- seeders.
+
+Não é necessário criar arquivos `.env` nem executar comandos adicionais.
 
 - Frontend: `http://localhost:5173`
 - Backend: `http://localhost:8000`
@@ -183,7 +183,6 @@ O frontend usa React com TypeScript e rotas protegidas. Zustand mantém somente 
 ## Melhorias com mais tempo
 
 - Adequar o backend ao Laravel 12.
-- Dockerizar backend e frontend e automatizar migrations e seeders no `docker compose up`.
 - Escalar o seeder para aproximadamente 500 orçamentos e 300 contratos, preservando os cenários inconsistentes.
 - Criar catálogo/facetas de filtros a partir de todo o conjunto consultável, sem depender da página carregada.
 - Modelar movimentações orçamentárias com data para uma evolução mensal fiel.
