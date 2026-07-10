@@ -182,9 +182,15 @@ class ApiService {
 
   private async refreshToken(): Promise<void> {
     if (!this.refreshPromise) {
-      this.refreshPromise = this.fetchRefreshToken().finally(() => {
-        this.refreshPromise = null;
-      });
+      this.refreshPromise = this.fetchRefreshToken()
+        .catch((error: unknown) => {
+          authStore.getState().logout();
+
+          throw error;
+        })
+        .finally(() => {
+          this.refreshPromise = null;
+        });
     }
 
     await this.refreshPromise;

@@ -38,6 +38,8 @@ services:
       APP_ENV: local
       APP_DEBUG: "true"
       APP_URL: http://localhost:8000
+      APP_KEY: base64:c2VwbGFnLWRvY2tlci1kZXYta2V5LTIwMjYtMDAwMVg=
+      JWT_SECRET: seplag-docker-jwt-secret-2026-development
       DB_CONNECTION: pgsql
       DB_HOST: db
       DB_PORT: 5432
