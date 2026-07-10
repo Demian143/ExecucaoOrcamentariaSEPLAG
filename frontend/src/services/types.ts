@@ -122,11 +122,15 @@ export type Orcamento = {
 };
 
 export type ListOrcamentosParams = PaginationParams & {
+  orgao_id?: number;
+  programa_id?: number;
+  acao_id?: number;
   ano?: number;
   situacao?: OrcamentoSituacao;
   percentual_minimo_executado?: number;
   percentual_maximo_executado?: number;
 };
+
 
 export type DashboardResponse = {
   total_orgaos: number;

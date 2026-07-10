@@ -3,8 +3,11 @@ import OrcamentosDataView from '../components/orcamentos/OrcamentosDataView';
 import OrcamentosFilters from '../components/orcamentos/OrcamentosFilters';
 import ApiService from '../services/api';
 import {
+  type Acao,
   type Orcamento,
+  type Orgao,
   type PaginatedResponse,
+  type Programa,
 } from '../services/types';
 import {
   buildOrcamentoParams,
@@ -17,6 +20,9 @@ function Orcamentos() {
   const [filters, setFilters] = useState<OrcamentoFilters>(initialOrcamentoFilters);
   const [appliedFilters, setAppliedFilters] = useState<OrcamentoFilters>(initialOrcamentoFilters);
   const [orcamentos, setOrcamentos] = useState<PaginatedResponse<Orcamento>>();
+  const [orgaos, setOrgaos] = useState<Orgao[]>([]);
+  const [programas, setProgramas] = useState<Programa[]>([]);
+  const [acoes, setAcoes] = useState<Acao[]>([]);
   const [page, setPage] = useState(1);
   const [perPage, setPerPage] = useState(10);
   const [isLoading, setIsLoading] = useState(true);
@@ -36,6 +42,18 @@ function Orcamentos() {
 
         if (isCurrentRequest) {
           setOrcamentos(response);
+          setOrgaos((current) => mergeById(
+            current,
+            response.data.flatMap((orcamento) => orcamento.unidade_gestora?.orgao ?? []),
+          ));
+          setProgramas((current) => mergeById(
+            current,
+            response.data.flatMap((orcamento) => orcamento.programa ?? []),
+          ));
+          setAcoes((current) => mergeById(
+            current,
+            response.data.flatMap((orcamento) => orcamento.acao ?? []),
+          ));
         }
       } catch {
         if (isCurrentRequest) {
@@ -59,6 +77,7 @@ function Orcamentos() {
     setFilters((currentFilters) => ({
       ...currentFilters,
       [field]: value,
+      ...(field === 'programa_id' ? { acao_id: '' } : {}),
     }));
   }
 
@@ -89,7 +108,12 @@ function Orcamentos() {
       </div>
 
       <OrcamentosFilters
+        acoes={filters.programa_id
+          ? acoes.filter((acao) => String(acao.programa_id) === filters.programa_id)
+          : acoes}
         filters={filters}
+        orgaos={orgaos}
+        programas={programas}
         onChange={updateFilter}
         onClear={clearFilters}
         onSubmit={applyFilters}
@@ -110,6 +134,12 @@ function Orcamentos() {
         perPage={perPage}
       />
     </section>
+  );
+}
+
+function mergeById<T extends { id: number }>(current: T[], received: T[]): T[] {
+  return Array.from(
+    new Map([...current, ...received].map((item) => [item.id, item])).values(),
   );
 }
 

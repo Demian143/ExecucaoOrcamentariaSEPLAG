@@ -1,4 +1,5 @@
 import { type FormEvent } from 'react';
+import { type Acao, type Orgao, type Programa } from '../../services/types';
 import {
   type OrcamentoFilters,
   situacaoLabels,
@@ -7,6 +8,9 @@ import {
 
 type OrcamentosFiltersProps = {
   filters: OrcamentoFilters;
+  acoes: Acao[];
+  orgaos: Orgao[];
+  programas: Programa[];
   onChange: (field: keyof OrcamentoFilters, value: string) => void;
   onClear: () => void;
   onSubmit: (event: FormEvent<HTMLFormElement>) => void;
@@ -16,6 +20,9 @@ const fieldClassName = 'mt-1 block w-full rounded-md border border-slate-300 bg-
 
 function OrcamentosFilters({
   filters,
+  acoes,
+  orgaos,
+  programas,
   onChange,
   onClear,
   onSubmit,
@@ -23,6 +30,30 @@ function OrcamentosFilters({
   return (
     <form className="rounded-md border border-slate-200 bg-white p-4 shadow-sm" onSubmit={onSubmit}>
       <div className="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+        <label className="text-sm font-medium text-slate-700">
+          Órgão
+          <select className={fieldClassName} value={filters.orgao_id} onChange={(event) => onChange('orgao_id', event.target.value)}>
+            <option value="">Todos</option>
+            {orgaos.map((orgao) => <option key={orgao.id} value={orgao.id}>{orgao.sigla} — {orgao.nome}</option>)}
+          </select>
+        </label>
+
+        <label className="text-sm font-medium text-slate-700">
+          Programa
+          <select className={fieldClassName} value={filters.programa_id} onChange={(event) => onChange('programa_id', event.target.value)}>
+            <option value="">Todos</option>
+            {programas.map((programa) => <option key={programa.id} value={programa.id}>{programa.codigo} — {programa.nome}</option>)}
+          </select>
+        </label>
+
+        <label className="text-sm font-medium text-slate-700">
+          Ação
+          <select className={fieldClassName} value={filters.acao_id} onChange={(event) => onChange('acao_id', event.target.value)}>
+            <option value="">Todas</option>
+            {acoes.map((acao) => <option key={acao.id} value={acao.id}>{acao.codigo} — {acao.nome}</option>)}
+          </select>
+        </label>
+
         <label className="text-sm font-medium text-slate-700">
           Ano
           <select className={fieldClassName} value={filters.ano} onChange={(event) => onChange('ano', event.target.value)}>

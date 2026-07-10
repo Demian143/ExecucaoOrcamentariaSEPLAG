@@ -1,6 +1,9 @@
 import { type ListOrcamentosParams, type OrcamentoSituacao } from '../services/types';
 
 export type OrcamentoFilters = {
+  orgao_id: string;
+  programa_id: string;
+  acao_id: string;
   ano: string;
   situacao: string;
   percentual_minimo_executado: string;
@@ -8,6 +11,9 @@ export type OrcamentoFilters = {
 };
 
 export const initialOrcamentoFilters: OrcamentoFilters = {
+  orgao_id: '',
+  programa_id: '',
+  acao_id: '',
   ano: '',
   situacao: '',
   percentual_minimo_executado: '',
@@ -35,6 +41,9 @@ export function buildOrcamentoParams(
   perPage: number,
 ): ListOrcamentosParams {
   return {
+    orgao_id: toOptionalNumber(filters.orgao_id),
+    programa_id: toOptionalNumber(filters.programa_id),
+    acao_id: toOptionalNumber(filters.acao_id),
     ano: toOptionalNumber(filters.ano),
     situacao: filters.situacao ? filters.situacao as OrcamentoSituacao : undefined,
     percentual_minimo_executado: toOptionalNumber(filters.percentual_minimo_executado),
