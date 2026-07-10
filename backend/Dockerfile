@@ -5,6 +5,7 @@ RUN apk add --no-cache \
         libpq \
         libzip \
     && apk add --no-cache --virtual .build-dependencies \
+        $PHPIZE_DEPS \
         icu-dev \
         libpq-dev \
         libzip-dev \
