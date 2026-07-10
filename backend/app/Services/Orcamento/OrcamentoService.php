@@ -58,9 +58,10 @@ class OrcamentoService
         );
     }
 
-    public function revisar(Orcamento $orcamento, User $analista): Orcamento
+    public function revisar(Orcamento $orcamento, User $analista, string $observacao): Orcamento
     {
         $orcamento->update([
+            'observacao' => $observacao,
             'revisado_por' => $analista->id,
             'revisado_em' => now(),
         ]);

@@ -28,6 +28,7 @@ class OrcamentoController extends Controller
         $orcamento = $this->orcamentoService->revisar(
             $orcamento,
             $this->analista($request),
+            $request->post('observacao')
         );
 
         return response()->json($orcamento);
