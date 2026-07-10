@@ -11,6 +11,7 @@ import type {
   ListOrgaosParams,
   LoginResponse,
   Orcamento,
+  OrcamentoFiltrosResponse,
   Orgao,
   PaginatedResponse,
 } from "./types";
@@ -130,6 +131,14 @@ class ApiService {
     const response = await this.client.get<PaginatedResponse<Orcamento>>(
       "/api/orcamentos",
       { params },
+    );
+
+    return response.data;
+  }
+
+  public async getOrcamentoFiltros(): Promise<OrcamentoFiltrosResponse> {
+    const response = await this.client.get<OrcamentoFiltrosResponse>(
+      "/api/orcamentos/filtros",
     );
 
     return response.data;

@@ -31,6 +31,32 @@ function Orcamentos() {
   useEffect(() => {
     let isCurrentRequest = true;
 
+    async function loadFiltros() {
+      try {
+        const response = await api.getOrcamentoFiltros();
+
+        if (isCurrentRequest) {
+          setOrgaos(response.orgaos);
+          setProgramas(response.programas);
+          setAcoes(response.acoes);
+        }
+      } catch {
+        if (isCurrentRequest) {
+          setErrorMessage('Não foi possível carregar as opções dos filtros.');
+        }
+      }
+    }
+
+    loadFiltros();
+
+    return () => {
+      isCurrentRequest = false;
+    };
+  }, [api]);
+
+  useEffect(() => {
+    let isCurrentRequest = true;
+
     async function loadOrcamentos() {
       setIsLoading(true);
       setErrorMessage('');
@@ -42,18 +68,6 @@ function Orcamentos() {
 
         if (isCurrentRequest) {
           setOrcamentos(response);
-          setOrgaos((current) => mergeById(
-            current,
-            response.data.flatMap((orcamento) => orcamento.unidade_gestora?.orgao ?? []),
-          ));
-          setProgramas((current) => mergeById(
-            current,
-            response.data.flatMap((orcamento) => orcamento.programa ?? []),
-          ));
-          setAcoes((current) => mergeById(
-            current,
-            response.data.flatMap((orcamento) => orcamento.acao ?? []),
-          ));
         }
       } catch {
         if (isCurrentRequest) {
@@ -134,12 +148,6 @@ function Orcamentos() {
         perPage={perPage}
       />
     </section>
-  );
-}
-
-function mergeById<T extends { id: number }>(current: T[], received: T[]): T[] {
-  return Array.from(
-    new Map([...current, ...received].map((item) => [item.id, item])).values(),
   );
 }
 

@@ -74,6 +74,12 @@ export type Acao = {
   updated_at: string | null;
 };
 
+export type OrcamentoFiltrosResponse = {
+  orgaos: Orgao[];
+  programas: Programa[];
+  acoes: Acao[];
+};
+
 export type Funcao = {
   id: number;
   nome: string;
