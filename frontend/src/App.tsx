@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Login from './pages/Login';
 import Charts from './pages/Charts';
 import Orcamentos from './pages/Orcamentos';
+import OrcamentoDetails from './pages/OrcamentoDetails';
 
 function App() {
 
@@ -16,6 +17,7 @@ function App() {
           <Route path='/' element={<Home />} />
           <Route path='/home' element={<Navigate to="/" replace />} />
           <Route path='/orcamentos' element={<Orcamentos />} />
+          <Route path='/orcamentos/:id' element={<OrcamentoDetails />} />
           <Route path='/graficos' element={<Charts />} />
         </Route>
       </Routes>

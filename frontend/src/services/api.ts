@@ -135,9 +135,21 @@ class ApiService {
     return response.data;
   }
 
-  public async revisarOrcamento(orcamentoId: number): Promise<Orcamento> {
+  public async getOrcamento(orcamentoId: number): Promise<Orcamento> {
+    const response = await this.client.get<Orcamento>(
+      `/api/orcamentos/${orcamentoId}`,
+    );
+
+    return response.data;
+  }
+
+  public async revisarOrcamento(
+    orcamentoId: number,
+    observacao: string,
+  ): Promise<Orcamento> {
     const response = await this.client.patch<Orcamento>(
       `/api/orcamentos/${orcamentoId}/revisao`,
+      { observacao },
     );
 
     return response.data;
