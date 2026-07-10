@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
+import { type GraficosResponse } from '../services/types';
 import ChartCard from '../components/charts/ChartCard';
 import ExecucaoPorOrgaoChart from '../components/charts/ExecucaoPorOrgaoChart';
 import ExecucaoPorProgramaChart from '../components/charts/ExecucaoPorProgramaChart';
 import EvolucaoMensalChart from '../components/charts/EvolucaoMensalChart';
 import EmpenhadoVsPagoChart from '../components/charts/EmpenhadoVsPagoChart';
-import { type GraficosResponse } from '../services/types';
+import MaioresContratosChart from '../components/charts/MaioresContratosChart';
 import ApiService from '../services/api';
 
 function Charts() {
@@ -36,6 +37,9 @@ function Charts() {
                     data={
                         graficos?.empenhado_vs_pago ?? 
                         {total_empenhado: 0, total_liquidado: 0, total_pago: 0 }} />
+            </ChartCard>
+            <ChartCard title='Top 10 Maiores Contratos'>
+                <MaioresContratosChart data={graficos?.top_10_contratos ?? []}/>
             </ChartCard>
         </div>
     );
