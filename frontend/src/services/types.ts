@@ -189,7 +189,8 @@ export type Contrato = {
 
 export type EvolucaoMensal = {
   mes: number;
-  total_mes: ApiNumeric;
+  total_empenhado: ApiNumeric;
+  total_pago: ApiNumeric;
 };
 
 export type GraficosResponse = {
