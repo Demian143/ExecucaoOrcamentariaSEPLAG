@@ -26,7 +26,7 @@ Configure o arquivo `backend/.env` para usar PostgreSQL:
 DB_CONNECTION=pgsql
 DB_HOST=127.0.0.1
 DB_PORT=5432
-DB_DATABASE=postgres
+DB_DATABASE=laravel
 DB_USERNAME=root
 DB_PASSWORD=root
 ```
@@ -65,14 +65,29 @@ O endereço do frontend é informado pelo Vite ao iniciar o servidor.
 
 ## Como utilizar Docker
 
-O Compose atual contém PostgreSQL e Adminer:
+Para construir e iniciar o backend, o PostgreSQL e o Adminer:
 
 ```bash
-docker compose up -d
-docker compose down
+docker compose up -d --build
 ```
 
-Backend e frontend ainda são executados localmente. A criação das imagens desses serviços e a automação de migrations e seeders no `docker compose up` estão listadas como melhorias pendentes.
+Na primeira configuração do ambiente, execute as migrations e os seeders manualmente:
+
+```bash
+docker compose exec backend php artisan migrate --seed
+```
+
+Os seeders não são executados automaticamente ao iniciar o container. Isso evita duplicação ou alteração inesperada de dados a cada `docker compose up`. Em execuções posteriores, aplique somente as novas migrations:
+
+```bash
+docker compose exec backend php artisan migrate
+```
+
+Para encerrar os containers:
+
+```bash
+docker compose down
+```
 
 ## Migrations e seeders
 
@@ -94,6 +109,8 @@ Recriar a base e executar os seeders:
 ```bash
 php artisan migrate:fresh --seed
 ```
+
+O comando `migrate:fresh` apaga todas as tabelas e dados existentes. Use-o somente quando a recriação completa da base for intencional, normalmente em desenvolvimento.
 
 O `DatabaseSeeder` cria o usuário de demonstração e chama `OrcamentoSeeder`. Esse seeder usa `database/data/dados-referencia.json`, mantém relações coerentes entre as dimensões e inclui casos como valores ausentes, saldo negativo, ausência de execução, contratos vencidos e registros revisados. O uso de `updateOrCreate` permite novas execuções sem duplicar os registros centrais.
 
