@@ -14,6 +14,7 @@ use App\Models\Programa;
 use App\Models\Subfuncao;
 use App\Models\UnidadeGestora;
 use App\Models\User;
+use DateTimeImmutable;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Seeder;
@@ -55,7 +56,9 @@ class OrcamentoSeeder extends Seeder
          *     naturezas_despesa: array<int, string>,
          *     fontes_recurso: array<int, string>,
          *     unidades_gestoras_exemplos: array<int, string>,
-         *     fornecedores: array<int, string>
+         *     fornecedores: array<int, string>,
+         *     configuracao_geracao: array{orcamentos: int, contratos: int},
+         *     objetos_contrato: array<int, string>
          * } $dados
          */
         $dados = json_decode(
@@ -117,7 +120,11 @@ class OrcamentoSeeder extends Seeder
         $this->seedUnidadesGestoras($dados['unidades_gestoras_exemplos']);
         $this->seedNames(Fornecedor::class, $dados['fornecedores']);
         $this->seedOrgaosProgramas();
-        $this->seedOrcamentos();
+        $this->seedOrcamentos(
+            $dados['configuracao_geracao']['orcamentos'],
+            $dados['configuracao_geracao']['contratos'],
+            $dados['objetos_contrato'],
+        );
     }
 
     /**
@@ -167,8 +174,14 @@ class OrcamentoSeeder extends Seeder
         }
     }
 
-    private function seedOrcamentos(): void
-    {
+    /**
+     * @param  array<int, string>  $objetosContrato
+     */
+    private function seedOrcamentos(
+        int $quantidadeOrcamentos,
+        int $quantidadeContratos,
+        array $objetosContrato,
+    ): void {
         $unidadesGestoras = UnidadeGestora::query()->orderBy('id')->get();
         $acoes = Acao::query()->with('programa')->orderBy('id')->get();
         $subfuncoes = Subfuncao::query()->orderBy('id')->get();
@@ -188,7 +201,7 @@ class OrcamentoSeeder extends Seeder
             throw new RuntimeException('Dimensões insuficientes para criar os orçamentos.');
         }
 
-        $valores = [
+        $casosEspeciais = [
             [1000000, 100000, 50000, 800000, 700000, 600000],
             [750000, 50000, 25000, 600000, 500000, 550000],
             [500000, 0, 10000, 550000, 530000, 500000],
@@ -202,20 +215,68 @@ class OrcamentoSeeder extends Seeder
             [400000, 0, 0, 0, 0, 0],
         ];
 
-        $orcamentos = collect();
+        if ($quantidadeOrcamentos < count($casosEspeciais)) {
+            throw new RuntimeException('A quantidade de orçamentos deve comportar todos os casos especiais.');
+        }
 
-        foreach ($valores as $index => $valor) {
-            $acao = $acoes[$index % $acoes->count()];
-            $unidadeGestora = $unidadesGestoras[$index % $unidadesGestoras->count()];
-            $subfuncao = $subfuncoes[$index % $subfuncoes->count()];
-            $naturezaDespesa = $naturezasDespesa[$index % $naturezasDespesa->count()];
-            $fonteRecurso = $fontesRecurso[$index % $fontesRecurso->count()];
+        $orcamentos = collect();
+        $chavesUtilizadas = [];
+        $cursorCombinacoes = 0;
+
+        for ($index = 0; $index < $quantidadeOrcamentos; $index++) {
+            if ($index < count($casosEspeciais)) {
+                $ano = 2026;
+                $acao = $acoes[$index % $acoes->count()];
+                $unidadeGestora = $unidadesGestoras[$index % $unidadesGestoras->count()];
+                $subfuncao = $subfuncoes[$index % $subfuncoes->count()];
+                $naturezaDespesa = $naturezasDespesa[$index % $naturezasDespesa->count()];
+                $fonteRecurso = $fontesRecurso[$index % $fontesRecurso->count()];
+                $valor = $casosEspeciais[$index];
+            } else {
+                do {
+                    $combinacao = $this->budgetCombination(
+                        $cursorCombinacoes++,
+                        $unidadesGestoras->count(),
+                        $acoes->count(),
+                        $subfuncoes->count(),
+                        $naturezasDespesa->count(),
+                        $fontesRecurso->count(),
+                    );
+
+                    $ano = $combinacao['ano'];
+                    $acao = $acoes[$combinacao['acao']];
+                    $unidadeGestora = $unidadesGestoras[$combinacao['unidade_gestora']];
+                    $subfuncao = $subfuncoes[$combinacao['subfuncao']];
+                    $naturezaDespesa = $naturezasDespesa[$combinacao['natureza_despesa']];
+                    $fonteRecurso = $fontesRecurso[$combinacao['fonte_recurso']];
+                    $chave = $this->budgetKey(
+                        $ano,
+                        $unidadeGestora->id,
+                        $acao->id,
+                        $subfuncao->id,
+                        $naturezaDespesa->id,
+                        $fonteRecurso->id,
+                    );
+                } while (isset($chavesUtilizadas[$chave]));
+
+                $valor = $this->generatedBudgetValues($index);
+            }
+
+            $chave = $this->budgetKey(
+                $ano,
+                $unidadeGestora->id,
+                $acao->id,
+                $subfuncao->id,
+                $naturezaDespesa->id,
+                $fonteRecurso->id,
+            );
+            $chavesUtilizadas[$chave] = true;
 
             $acao->programa->orgaos()->syncWithoutDetaching([$unidadeGestora->orgao_id]);
 
             $orcamentos->push(Orcamento::updateOrCreate(
                 [
-                    'ano' => 2026,
+                    'ano' => $ano,
                     'unidade_gestora_id' => $unidadeGestora->id,
                     'acao_id' => $acao->id,
                     'subfuncao_id' => $subfuncao->id,
@@ -237,7 +298,90 @@ class OrcamentoSeeder extends Seeder
             ));
         }
 
-        $this->seedContratos($orcamentos->all());
+        $this->seedContratos($orcamentos->all(), $quantidadeContratos, $objetosContrato);
+    }
+
+    /**
+     * @return array{ano: int, unidade_gestora: int, acao: int, subfuncao: int, natureza_despesa: int, fonte_recurso: int}
+     */
+    private function budgetCombination(
+        int $cursor,
+        int $unidadesGestoras,
+        int $acoes,
+        int $subfuncoes,
+        int $naturezasDespesa,
+        int $fontesRecurso,
+    ): array {
+        $ano = 2022 + ($cursor % 5);
+        $cursor = intdiv($cursor, 5);
+        $acao = $cursor % $acoes;
+        $cursor = intdiv($cursor, $acoes);
+        $unidadeGestora = $cursor % $unidadesGestoras;
+        $cursor = intdiv($cursor, $unidadesGestoras);
+        $subfuncao = $cursor % $subfuncoes;
+        $cursor = intdiv($cursor, $subfuncoes);
+        $naturezaDespesa = $cursor % $naturezasDespesa;
+        $cursor = intdiv($cursor, $naturezasDespesa);
+
+        return [
+            'ano' => $ano,
+            'unidade_gestora' => $unidadeGestora,
+            'acao' => $acao,
+            'subfuncao' => $subfuncao,
+            'natureza_despesa' => $naturezaDespesa,
+            'fonte_recurso' => $cursor % $fontesRecurso,
+        ];
+    }
+
+    private function budgetKey(
+        int $ano,
+        int $unidadeGestoraId,
+        int $acaoId,
+        int $subfuncaoId,
+        int $naturezaDespesaId,
+        int $fonteRecursoId,
+    ): string {
+        return implode(':', [
+            $ano,
+            $unidadeGestoraId,
+            $acaoId,
+            $subfuncaoId,
+            $naturezaDespesaId,
+            $fonteRecursoId,
+        ]);
+    }
+
+    /**
+     * @return array{0: int, 1: int, 2: int, 3: int, 4: int, 5: int}
+     */
+    private function generatedBudgetValues(int $index): array
+    {
+        $dotacaoInicial = 250000 + (($index * 7919) % 4750000);
+        $suplementacoes = $index % 7 === 0 ? (int) round($dotacaoInicial * 0.12) : 0;
+        $anulacoes = $index % 11 === 0 ? (int) round($dotacaoInicial * 0.05) : 0;
+        $dotacaoAtualizada = $dotacaoInicial + $suplementacoes - $anulacoes;
+
+        $percentuaisExecucao = [0.18, 0.35, 0.52, 0.68, 0.79, 0.88, 0.96];
+        $percentualExecucao = $percentuaisExecucao[$index % count($percentuaisExecucao)];
+
+        if ($index % 41 === 0) {
+            $percentualExecucao = 0;
+        } elseif ($index % 29 === 0) {
+            $percentualExecucao = 1.06;
+        }
+
+        $valorEmpenhado = (int) round($dotacaoAtualizada * $percentualExecucao);
+        $valorLiquidado = (int) round($valorEmpenhado * (0.72 + (($index % 4) * 0.06)));
+        $valorPago = (int) round($valorLiquidado * (0.78 + (($index % 3) * 0.07)));
+
+        return [
+            $dotacaoInicial,
+            $suplementacoes,
+            $anulacoes,
+            $valorEmpenhado,
+            $valorLiquidado,
+            $valorPago,
+        ];
     }
 
     /**
@@ -274,32 +418,42 @@ class OrcamentoSeeder extends Seeder
 
     /**
      * @param  array<int, Orcamento>  $orcamentos
+     * @param  array<int, string>  $objetosContrato
      */
-    private function seedContratos(array $orcamentos): void
-    {
+    private function seedContratos(
+        array $orcamentos,
+        int $quantidadeContratos,
+        array $objetosContrato,
+    ): void {
         $fornecedores = Fornecedor::query()->orderBy('id')->get();
 
-        if ($fornecedores->isEmpty()) {
-            throw new RuntimeException('Nenhum fornecedor disponível para criar os contratos.');
+        if ($fornecedores->isEmpty() || $orcamentos === [] || $objetosContrato === []) {
+            throw new RuntimeException('Dados insuficientes para criar os contratos.');
         }
 
-        $contratos = [
-            ['CT-2026-001', 'Manutenção de instalações públicas', 250000, 'vigente', '2025-01-01', '2025-12-31'],
-            ['CT-2026-002', 'Fornecimento de equipamentos', 480000, 'encerrado', '2025-02-01', '2025-11-30'],
-            ['CT-2026-003', 'Serviços especializados de tecnologia', 320000, 'suspenso', '2026-01-01', '2026-12-31'],
-            ['CT-2026-004', 'Aquisição de insumos', 175000, 'vigente', '2026-03-01', '2027-02-28'],
-        ];
+        for ($index = 0; $index < $quantidadeContratos; $index++) {
+            $inicio = new DateTimeImmutable(sprintf(
+                '%d-%02d-%02d',
+                2024 + ($index % 3),
+                ($index % 12) + 1,
+                ($index % 20) + 1,
+            ));
+            $fim = $inicio->modify(sprintf('+%d months', 6 + ($index % 25)));
+            $status = match (true) {
+                $index % 10 === 0 => 'suspenso',
+                $fim < new DateTimeImmutable('2026-07-10') => 'encerrado',
+                default => 'vigente',
+            };
 
-        foreach ($contratos as $index => $contrato) {
             Contrato::updateOrCreate(
-                ['numero' => $contrato[0]],
+                ['numero' => sprintf('CT-2026-%03d', $index + 1)],
                 [
-                    'objeto' => $contrato[1],
-                    'valor' => $contrato[2],
-                    'status' => $contrato[3],
-                    'vigencia_inicio' => $contrato[4],
-                    'vigencia_fim' => $contrato[5],
-                    'orcamento_id' => $orcamentos[$index]->id,
+                    'objeto' => $objetosContrato[$index % count($objetosContrato)],
+                    'valor' => 75000 + (($index * 37691) % 925000),
+                    'status' => $status,
+                    'vigencia_inicio' => $inicio->format('Y-m-d'),
+                    'vigencia_fim' => $fim->format('Y-m-d'),
+                    'orcamento_id' => $orcamentos[$index % count($orcamentos)]->id,
                     'fornecedor_id' => $fornecedores[$index % $fornecedores->count()]->id,
                 ],
             );

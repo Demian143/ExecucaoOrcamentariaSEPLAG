@@ -108,6 +108,8 @@ O comando `migrate:fresh` apaga todas as tabelas e dados existentes. Use-o somen
 
 O `DatabaseSeeder` cria o usuário de demonstração e chama `OrcamentoSeeder`. Esse seeder usa `database/data/dados-referencia.json`, mantém relações coerentes entre as dimensões e inclui casos como valores ausentes, saldo negativo, ausência de execução, contratos vencidos e registros revisados. O uso de `updateOrCreate` permite novas execuções sem duplicar os registros centrais.
 
+A base fictícia contém 500 orçamentos e 300 contratos gerados de forma determinística.
+
 ## Credenciais de acesso
 
 ```text
@@ -183,7 +185,6 @@ O frontend usa React com TypeScript e rotas protegidas. Zustand mantém somente 
 ## Melhorias com mais tempo
 
 - Adequar o backend ao Laravel 12.
-- Escalar o seeder para aproximadamente 500 orçamentos e 300 contratos, preservando os cenários inconsistentes.
 - Criar catálogo/facetas de filtros a partir de todo o conjunto consultável, sem depender da página carregada.
 - Modelar movimentações orçamentárias com data para uma evolução mensal fiel.
 - Adotar TanStack Query para cache, deduplicação e invalidação de requisições.

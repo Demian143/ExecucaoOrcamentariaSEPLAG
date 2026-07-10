@@ -105,6 +105,8 @@ php artisan migrate:fresh --seed
 
 `migrate:fresh` apaga todas as tabelas. O seeder usa `updateOrCreate`, permitindo reexecuções sem duplicar os registros centrais.
 
+Os parâmetros em `database/data/dados-referencia.json` geram 500 orçamentos e 300 contratos, distribuídos entre exercícios, órgãos, programas, ações, classificações e fornecedores. A geração preserva cenários de inconsistência, saldo negativo, ausência de execução, contratos vencidos e registros revisados.
+
 ## Testes e qualidade
 
 Os testes usam Pest e esperam um banco PostgreSQL chamado `laravel_testing`:

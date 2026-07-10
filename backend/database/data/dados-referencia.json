@@ -1,5 +1,9 @@
 {
-  "descricao": "Dados de referência para geração da base fictícia. Use estes nomes nos seeders/factories para produzir dados realistas. A modelagem das tabelas, relacionamentos e a geração dos valores continuam por sua conta.",
+  "descricao": "Dados de referência e parâmetros para geração determinística da base fictícia de execução orçamentária.",
+  "configuracao_geracao": {
+    "orcamentos": 500,
+    "contratos": 300
+  },
   "orgaos": [
     { "sigla": "SEPLAG", "nome": "Secretaria de Estado de Planejamento e Gestão" },
     { "sigla": "SEEDUC", "nome": "Secretaria de Estado de Educação" },
@@ -205,5 +209,27 @@
     "Engevias Pavimentação e Terraplenagem S.A.",
     "Clima Frio Ar-Condicionado e Refrigeração Ltda.",
     "Mobiliário Corporativo Atlântico Ltda."
+  ],
+  "objetos_contrato": [
+    "Manutenção preventiva e corretiva de instalações públicas",
+    "Fornecimento de equipamentos e materiais permanentes",
+    "Serviços especializados de tecnologia da informação",
+    "Aquisição e distribuição de insumos",
+    "Reforma e adequação de unidades administrativas",
+    "Locação de veículos para atividades operacionais",
+    "Serviços continuados de limpeza e conservação",
+    "Vigilância patrimonial e controle de acesso",
+    "Fornecimento de alimentação coletiva",
+    "Implantação de infraestrutura de rede e telecomunicações",
+    "Execução de obras de pavimentação e drenagem",
+    "Aquisição de medicamentos e materiais hospitalares",
+    "Produção de material gráfico e comunicação institucional",
+    "Manutenção de sistemas de climatização",
+    "Consultoria técnica para projetos estratégicos",
+    "Fornecimento de mobiliário corporativo",
+    "Capacitação e formação continuada de servidores",
+    "Serviços de transporte e logística",
+    "Manutenção de equipamentos hospitalares",
+    "Desenvolvimento e sustentação de sistemas corporativos"
   ]
 }
