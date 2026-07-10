@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import ChartCard from '../components/ChartCard';
 import ExecucaoPorOrgaoChart from '../components/charts/ExecucaoPorOrgaoChart';
 import EvolucaoMensalChart from '../components/charts/EvolucaoMensalChart';
+import EmpenhadoVsPagoChart from '../components/charts/EmpenhadoVsPagoChart';
 import { type GraficosResponse } from '../services/types';
 import ApiService from '../services/api';
 
@@ -25,6 +26,12 @@ function Charts() {
             </ChartCard>
             <ChartCard title="Evolução mensal">
                 <EvolucaoMensalChart data={graficos?.evolucao_mensal ?? []} />
+            </ChartCard>
+            <ChartCard title='Empenhado X Pago'>
+                <EmpenhadoVsPagoChart 
+                    data={
+                        graficos?.empenhado_vs_pago ?? 
+                        {total_empenhado: 0, total_liquidado: 0, total_pago: 0 }} />
             </ChartCard>
         </div>
     );
