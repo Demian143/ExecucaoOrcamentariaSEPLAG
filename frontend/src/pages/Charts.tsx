@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import ChartCard from '../components/ChartCard';
 import ExecucaoPorOrgaoChart from '../components/charts/ExecucaoPorOrgaoChart';
+import ExecucaoPorProgramaChart from '../components/charts/ExecucaoPorProgramaChart';
 import EvolucaoMensalChart from '../components/charts/EvolucaoMensalChart';
 import EmpenhadoVsPagoChart from '../components/charts/EmpenhadoVsPagoChart';
 import { type GraficosResponse } from '../services/types';
@@ -23,6 +24,9 @@ function Charts() {
         <div className="space-y-4">
             <ChartCard title="Execução por órgão">
                 <ExecucaoPorOrgaoChart data={graficos?.execucao_por_orgao ?? []} />
+            </ChartCard>
+            <ChartCard title='Execução por Programa'>
+                <ExecucaoPorProgramaChart data={graficos?.execucao_por_programa ?? []} />
             </ChartCard>
             <ChartCard title="Evolução mensal">
                 <EvolucaoMensalChart data={graficos?.evolucao_mensal ?? []} />
