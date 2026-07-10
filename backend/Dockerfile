@@ -1,21 +1,11 @@
 FROM php:8.5-cli-alpine AS application
 
 RUN apk add --no-cache \
-        icu-libs \
         libpq \
-        libzip \
     && apk add --no-cache --virtual .build-dependencies \
         $PHPIZE_DEPS \
-        icu-dev \
         libpq-dev \
-        libzip-dev \
-    && docker-php-ext-install -j"$(nproc)" \
-        bcmath \
-        intl \
-        opcache \
-        pcntl \
-        pdo_pgsql \
-        zip \
+    && docker-php-ext-install pdo_pgsql \
     && apk del .build-dependencies
 
 WORKDIR /var/www/html
