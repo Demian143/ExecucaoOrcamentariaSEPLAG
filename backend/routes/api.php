@@ -5,6 +5,7 @@ use App\Http\Controllers\ContratoController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GraficoController;
 use App\Http\Controllers\OrcamentoController;
+use App\Http\Controllers\OrcamentoFiltroController;
 use App\Http\Controllers\OrgaoController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -17,6 +18,7 @@ Route::get('/dashboard', [DashboardController::class, 'index'])->middleware('aut
 Route::get('/graficos', [GraficoController::class, 'index'])->middleware('auth:api');
 Route::get('/orgaos', [OrgaoController::class, 'index'])->middleware('auth:api');
 Route::get('/orcamentos', [OrcamentoController::class, 'index'])->middleware('auth:api');
+Route::get('/orcamentos/filtros', OrcamentoFiltroController::class)->middleware('auth:api');
 Route::get('/orcamentos/{orcamento}', [OrcamentoController::class, 'show'])->middleware('auth:api');
 Route::patch('/orcamentos/{orcamento}/revisao', [OrcamentoController::class, 'revisar'])->middleware('auth:api');
 Route::get('/contratos', [ContratoController::class, 'index'])->middleware('auth:api');
