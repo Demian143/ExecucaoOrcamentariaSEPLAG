@@ -20,6 +20,12 @@ const sliceColors = [
     '#94A3B8',
 ];
 
+const formatCurrency = (value: number | string) =>
+    new Intl.NumberFormat('pt-BR', {
+        notation: 'compact',
+        maximumFractionDigits: 1,
+    }).format(Number(value));
+
 function ProgramaTooltip({ active, payload }: TooltipContentProps) {
     if (!active || !payload?.length) {
         return null;
@@ -31,8 +37,8 @@ function ProgramaTooltip({ active, payload }: TooltipContentProps) {
         <div className="max-w-xs rounded-md border border-slate-200 bg-white px-3 py-2 text-sm shadow-lg">
             <p className="font-semibold text-gov-dark">{programa.nome_programa}</p>
             <div className="mt-2 space-y-1 text-slate-600">
-                <p>Dotação atualizada: {programa.dotacao_atualizada}</p>
-                <p>Total empenhado: {programa.total_empenhado}</p>
+                <p>Dotação atualizada: {formatCurrency(programa.dotacao_atualizada)}</p>
+                <p>Total empenhado: {formatCurrency(programa.total_empenhado)}</p>
             </div>
         </div>
     );
