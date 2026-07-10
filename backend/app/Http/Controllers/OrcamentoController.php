@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\ListOrcamentosRequest;
+use App\Http\Requests\RevisarOrcamentoRequest;
 use App\Models\Orcamento;
 use App\Models\User;
 use App\Services\Orcamento\OrcamentoService;
@@ -23,12 +24,12 @@ class OrcamentoController extends Controller
         return response()->json($orcamentos);
     }
 
-    public function revisar(Request $request, Orcamento $orcamento): JsonResponse
+    public function revisar(RevisarOrcamentoRequest $request, Orcamento $orcamento): JsonResponse
     {
         $orcamento = $this->orcamentoService->revisar(
             $orcamento,
             $this->analista($request),
-            $request->post('observacao')
+            $request->validated('observacao')
         );
 
         return response()->json($orcamento);
