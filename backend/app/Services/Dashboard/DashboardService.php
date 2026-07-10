@@ -23,7 +23,8 @@ class DashboardService
      *     liquidado: float,
      *     pago: float,
      *     saldo: float,
-     *     percentual_execucao: float
+     *     percentual_execucao: float,
+     *     saldos_negativos: int
      * }
      */
     public function index(): array
@@ -37,6 +38,7 @@ class DashboardService
             'pago' => $this->totalPago(),
             'saldo' => $this->totalSaldo(),
             'percentual_execucao' => $this->percentualExecucao(),
+            'saldos_negativos' => $this->totalSaldosNegativos(),
         ];
     }
 
@@ -88,6 +90,16 @@ class DashboardService
     public function totalSaldo(): float
     {
         return $this->totalOrcamento() - $this->totalEmpenhado();
+    }
+
+    public function totalSaldosNegativos(): int
+    {
+        return $this->orcamento->newQuery()
+            ->whereRaw('
+                COALESCE(valor_empenhado, 0) >
+                COALESCE(dotacao_inicial, 0) + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)
+            ')
+            ->count();
     }
 
     public function percentualExecucao(): float
