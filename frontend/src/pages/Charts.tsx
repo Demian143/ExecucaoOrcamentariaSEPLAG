@@ -8,6 +8,12 @@ import EmpenhadoVsPagoChart from '../components/charts/EmpenhadoVsPagoChart';
 import MaioresContratosChart from '../components/charts/MaioresContratosChart';
 import ApiService from '../services/api';
 
+const emptyEmpenhadoVsPago = {
+    total_empenhado: 0,
+    total_liquidado: 0,
+    total_pago: 0,
+};
+
 function Charts() {
     const api = useMemo(() => new ApiService(), []);
     const [graficos, setGraficos] = useState<GraficosResponse>();
@@ -21,26 +27,36 @@ function Charts() {
         carregarDados();
     }, [api]);
 
+    const charts = [
+        {
+            title: 'Execução por órgão',
+            chart: <ExecucaoPorOrgaoChart data={graficos?.execucao_por_orgao ?? []} />,
+        },
+        {
+            title: 'Execução por Programa',
+            chart: <ExecucaoPorProgramaChart data={graficos?.execucao_por_programa ?? []} />,
+        },
+        {
+            title: 'Evolução mensal',
+            chart: <EvolucaoMensalChart data={graficos?.evolucao_mensal ?? []} />,
+        },
+        {
+            title: 'Empenhado X Pago',
+            chart: <EmpenhadoVsPagoChart data={graficos?.empenhado_vs_pago ?? emptyEmpenhadoVsPago} />,
+        },
+        {
+            title: 'Top 10 Maiores Contratos',
+            chart: <MaioresContratosChart data={graficos?.top_10_contratos ?? []} />,
+        },
+    ];
+
     return (
         <div className="space-y-4">
-            <ChartCard title="Execução por órgão">
-                <ExecucaoPorOrgaoChart data={graficos?.execucao_por_orgao ?? []} />
-            </ChartCard>
-            <ChartCard title='Execução por Programa'>
-                <ExecucaoPorProgramaChart data={graficos?.execucao_por_programa ?? []} />
-            </ChartCard>
-            <ChartCard title="Evolução mensal">
-                <EvolucaoMensalChart data={graficos?.evolucao_mensal ?? []} />
-            </ChartCard>
-            <ChartCard title='Empenhado X Pago'>
-                <EmpenhadoVsPagoChart 
-                    data={
-                        graficos?.empenhado_vs_pago ?? 
-                        {total_empenhado: 0, total_liquidado: 0, total_pago: 0 }} />
-            </ChartCard>
-            <ChartCard title='Top 10 Maiores Contratos'>
-                <MaioresContratosChart data={graficos?.top_10_contratos ?? []}/>
-            </ChartCard>
+            {charts.map(({ title, chart }) => (
+                <ChartCard key={title} title={title}>
+                    {chart}
+                </ChartCard>
+            ))}
         </div>
     );
 }
