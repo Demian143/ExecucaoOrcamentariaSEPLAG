@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import ChartCard from '../components/ChartCard';
+import ChartCard from '../components/charts/ChartCard';
 import ExecucaoPorOrgaoChart from '../components/charts/ExecucaoPorOrgaoChart';
 import ExecucaoPorProgramaChart from '../components/charts/ExecucaoPorProgramaChart';
 import EvolucaoMensalChart from '../components/charts/EvolucaoMensalChart';
