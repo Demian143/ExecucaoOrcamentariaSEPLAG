@@ -140,6 +140,7 @@ export type DashboardResponse = {
   pago: number;
   saldo: number;
   percentual_execucao: number;
+  saldos_negativos: number;
 };
 
 export type ExecucaoPorOrgao = {

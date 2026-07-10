@@ -14,7 +14,7 @@ type SidebarProps = {
 const navigationItems: NavigationItem[] = [
   {
     label: "Dashboard",
-    path: "/home",
+    path: "/",
     icon: (className) => (
       <svg
         aria-hidden="true"
@@ -100,7 +100,7 @@ function Sidebar({ onNavigate }: SidebarProps) {
                   : "text-slate-200 hover:bg-white/10 hover:text-white",
               ].join(" ")
             }
-            end={item.path === "/home"}
+            end={item.path === "/"}
             key={item.path}
             onClick={onNavigate}
             to={item.path}

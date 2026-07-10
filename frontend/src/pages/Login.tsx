@@ -21,7 +21,7 @@ function Login() {
 
     try {
       await api.login(email, password);
-      navigate("/home", { replace: true });
+      navigate("/", { replace: true });
     } catch {
       setErrorMessage("Não foi possível entrar. Verifique seu login e senha.");
     } finally {
@@ -30,7 +30,7 @@ function Login() {
   }
 
   if (isAuthenticated) {
-    return <Navigate to="/home" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return (
