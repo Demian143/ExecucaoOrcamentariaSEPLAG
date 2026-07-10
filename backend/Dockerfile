@@ -28,10 +28,11 @@ RUN composer install \
         --prefer-dist \
         --optimize-autoloader \
     && composer clear-cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+    && chown -R www-data:www-data storage bootstrap/cache \
+    && chmod +x /var/www/html/docker-entrypoint.sh
 
 USER www-data
 
 EXPOSE 8000
 
-CMD ["php", "artisan", "serve", "--host=0.0.0.0", "--port=8000"]
+ENTRYPOINT ["/var/www/html/docker-entrypoint.sh"]

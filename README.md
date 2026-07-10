@@ -65,23 +65,17 @@ O endereço do frontend é informado pelo Vite ao iniciar o servidor.
 
 ## Como utilizar Docker
 
-Para construir e iniciar o backend, o PostgreSQL e o Adminer:
+Para construir e iniciar automaticamente o backend, o frontend, o PostgreSQL e o Adminer:
 
 ```bash
 docker compose up -d --build
 ```
 
-Na primeira configuração do ambiente, execute as migrations e os seeders manualmente:
+Ao iniciar, o backend aguarda o banco ficar disponível, executa automaticamente as migrations e os seeders e, em seguida, disponibiliza a API. Os seeders usam `updateOrCreate`, permitindo novas execuções sem duplicar os registros centrais. Não é necessário criar arquivos `.env` nem executar comandos adicionais para iniciar o ambiente Docker.
 
-```bash
-docker compose exec backend php artisan migrate --seed
-```
-
-Os seeders não são executados automaticamente ao iniciar o container. Isso evita duplicação ou alteração inesperada de dados a cada `docker compose up`. Em execuções posteriores, aplique somente as novas migrations:
-
-```bash
-docker compose exec backend php artisan migrate
-```
+- Frontend: `http://localhost:5173`
+- Backend: `http://localhost:8000`
+- Adminer: `http://localhost:8080`
 
 Para encerrar os containers:
 
