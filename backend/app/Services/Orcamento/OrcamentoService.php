@@ -48,8 +48,15 @@ class OrcamentoService
             $query->where('ano', $filters->ano);
         }
 
-        if ($filters->situacao !== null) {
+        if ($filters->situacao !== null and $filters->situacao !== 'saldo_negativo') {
             $query->where('situacao', $filters->situacao);
+        }
+
+        if($filters->situacao == 'saldo_negativo'){
+            $query->whereRaw('
+                COALESCE(valor_empenhado, 0) >
+                COALESCE(dotacao_inicial, 0) + COALESCE(suplementacoes, 0) - COALESCE(anulacoes, 0)
+            ');
         }
 
         return $query->paginate(
