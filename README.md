@@ -193,7 +193,6 @@ O frontend usa React com TypeScript e rotas protegidas. Zustand mantém somente 
 ## Melhorias com mais tempo
 
 - Adequar o backend ao Laravel 12.
-- Criar catálogo/facetas de filtros a partir de todo o conjunto consultável, sem depender da página carregada.
 - Modelar movimentações orçamentárias com data para uma evolução mensal fiel.
 - Adotar TanStack Query para cache, deduplicação e invalidação de requisições.
 - Ampliar testes unitários, de integração, componentes e fluxo E2E.
